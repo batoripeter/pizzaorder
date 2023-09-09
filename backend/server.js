@@ -4,11 +4,17 @@ const fs = require("fs");
 const path = require("path");
 const app = express();
 const cors = require ("cors")
+const client = require("pg")
 
 app.use(cors())
 app.use(fileUpload());
 app.use(express.text())
 app.use(express.json())
+
+
+client = ("postgres://batorifoto:8X7vjzSmuByH@ep-sweet-snow-44107683.us-west-2.aws.neon.tech/neondb?options=project%3Dep-sweet-snow-44107683&sslmode=require")
+
+
 app.get("/", async(req, res) =>{
 const uploadPath = __dirname + "/../backend/data/" + "profile.json";
 let pizzas = []
@@ -20,9 +26,26 @@ res.send(pizzas)
 app.use("/public", express.static(`${__dirname}/../frontend/public`));
 
 
+
+
+
+
+
 //add new pizza to json
-app.get("/profile.jpg", (req, res) =>
-	res.sendFile(path.join(`${__dirname}/../backend/data/profile.jpg`)));
+
+
+app.get("/", async (req,) => {
+	const result = await client.query("select * from profile")
+	res.json(result.rows)
+	console.log(result.rows)
+  })
+/*
+		app.get("/profile.jpg", (req, res) =>
+			res.sendFile(path.join(`${__dirname}/../backend/data/profile.jpg`)));
+
+*/
+
+
 
 	  app.post("/", async (req, res) => {
 		const pictureUploadPath = __dirname + "/../backend/data/" + req.body.pictureName;
@@ -72,4 +95,5 @@ app.put("/", async (req, res) => {
 	return res.status(200).send("done");
 });
 
-app.listen(9000, (_) => console.log("127.0.0.1:9000"));
+//app.listen(9000, (_) => console.log("127.0.0.1:9000"));
+client.connect().then(()=> server.listen(9000))
